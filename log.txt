@@ -1,0 +1,13 @@
+Daniel Vu Dao
+danielvd
+
+Walid Owais
+walid
+
+02/11 4:00pm - 7:00pm
+30 min, Daniel driving, research
+30 min, Walid driving, research
+30 min, Daniel driving, research
+30 min, Walid driving, tested passing void * argments to function
+30 min, Daniel driving, tested passing void * argments to function
+30 min, Walid driving, tested passing void * argments to function
