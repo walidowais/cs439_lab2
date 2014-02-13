@@ -3,7 +3,6 @@
 #include <stdint.h> 
 #include <stdlib.h>
 
-
 /*
 
 For saving the values into registers 
@@ -19,10 +18,6 @@ __asm__ volatile("mov %%rax, %%rbp" : : "a" (current_thread->ebp) );
 
 */
 
-struct thread *root; 
-struct thread *last;	 
-
-
 struct thread{
 	//Some notes to add: size is the difference between the stack pointer and the base pointer 
 	uintptr_t* stack; //Points to the stack 
@@ -33,6 +28,15 @@ struct thread{
 
 };
 
+// Queue stuff
+struct node{
+	struct thread *current;
+	struct node *next;
+};
+
+struct node *root;
+struct node *last;
+
 /*	Returns a pointer to a thread  
 	Accepts a function into the argument f (pointer to the function)
 	arg becomes the function's arguments
@@ -41,7 +45,13 @@ struct thread *thread_create(void (*f)(void *arg), void *arg){
 
 	struct thread *thread_pointer = malloc(sizeof(struct thread));
 
-	thread_pointer -> stack = malloc(sizeof(uintptr_t) * 4096);
+	int test = posix_memalign((void **)&(thread_pointer->stack), 8, (sizeof(uintptr_t)) * 4096);
+
+	if(test){
+		fprintf(stderr, "Error with posix_memalign()\n");
+		exit(1);
+	}
+
 	thread_pointer -> stack_pointer = thread_pointer -> stack;
 	thread_pointer -> base_pointer = thread_pointer -> stack_pointer;
 
@@ -53,7 +63,16 @@ struct thread *thread_create(void (*f)(void *arg), void *arg){
 }
 
 void thread_add_runqueue(struct thread *t){
+	if(!root){
+		root = malloc(sizeof(struct node));
+		last = root;
+	}
+	else{
+		last->next = malloc(sizeof(struct node));
+		last = last->next;
+	}
 
+	last->current = t;
 }
 
 void thread_yield(void){

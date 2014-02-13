@@ -43,7 +43,7 @@ void f1(void *arg)
 int main(int argc, char **argv)
 {
     struct thread *t1 = thread_create(f1, NULL);
-    // thread_add_runqueue(t1);
+    thread_add_runqueue(t1);
     // thread_start_threading();
     printf("\nexited\n");
     return 0;
