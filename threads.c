@@ -29,6 +29,7 @@ struct thread{
 	uintptr_t* base_pointer; //Points to bottom of stack or however the fuck we're implementing it 
  	uintptr_t* stack_pointer; //Points to where we currently are on stack 
  	void (*function_pointer)(void *); //Points to function we're supposed to run 
+ 	void *parameters;
 
 };
 
@@ -44,14 +45,15 @@ struct thread *thread_create(void (*f)(void *arg), void *arg){
 	thread_pointer -> stack_pointer = thread_pointer -> stack;
 	thread_pointer -> base_pointer = thread_pointer -> stack_pointer;
 
-	thread_pointer -> function_pointer(void *) = f(arg);
+	thread_pointer -> function_pointer = f;
+	thread_pointer -> parameters = arg;
 
 	return thread_pointer;
 
 }
 
 void thread_add_runqueue(struct thread *t){
-	
+
 }
 
 void thread_yield(void){
