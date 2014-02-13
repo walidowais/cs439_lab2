@@ -29,10 +29,7 @@ struct thread{
 	uintptr_t* base_pointer; //Points to bottom of stack or however the fuck we're implementing it 
  	uintptr_t* stack_pointer; //Points to where we currently are on stack 
  	void (*function_pointer)(void *); //Points to function we're supposed to run 
- 	struct thread *next; //Next thread in the list 
 
-	//Allocates an initial stack with 4096 slots 
-	// stack = (uni_ptr_t*)malloc(sizeof(uintptr_t) * 4096);
 };
 
 /*	Returns a pointer to a thread  
@@ -40,28 +37,21 @@ struct thread{
 	arg becomes the function's arguments
 */ 
 struct thread *thread_create(void (*f)(void *arg), void *arg){
-	// printf("hello world!\n");
-	// if(root == 0){
-	// 	root = malloc(sizeof(struct thread));
-	// 	last = root;
-	// 	root->function_pointer = f(arg);   
-	// 	return root;
-	// }
 
-	// else{
-	// 	last->next = malloc(sizeof(struct thread));
-	// 	last = last->next;
-	// 	last->function_pointer = f(arg); 
-	// 	return last; 
-	// } 
 	struct thread *thread_pointer = malloc(sizeof(struct thread));
+
 	thread_pointer -> stack = malloc(sizeof(uintptr_t) * 4096);
+	thread_pointer -> stack_pointer = thread_pointer -> stack;
+	thread_pointer -> base_pointer = thread_pointer -> stack_pointer;
+
+	thread_pointer -> function_pointer(void *) = f(arg);
+
 	return thread_pointer;
 
 }
 
 void thread_add_runqueue(struct thread *t){
-
+	
 }
 
 void thread_yield(void){
