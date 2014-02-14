@@ -90,13 +90,13 @@ void dispatch(void){
 
 void schedule(void){
 	printf("schedule\n");
+
 	struct node *temp = root_node;
 	root_node = root_node->next;
-
 	current_thread = temp->node_thread;
-	last_node->next = temp;
-	last_node = last_node->next;
-	last_node->next = 0;
+
+	free(temp);
+	thread_add_runqueue(current_thread);
 }
 
 void thread_exit(void){
