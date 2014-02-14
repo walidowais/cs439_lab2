@@ -2,6 +2,7 @@
 #include "threads.h" 
 #include <stdint.h> 
 #include <stdlib.h>
+#include <setjmp.h>
 
 /*
 
@@ -25,6 +26,7 @@ struct thread{
  	uintptr_t* stack_pointer; //Points to where we currently are on stack 
  	void (*function_pointer)(void *); //Points to function we're supposed to run 
  	void *parameters;
+ 	jmp_buf saved_state;
 
 };
 
@@ -81,11 +83,12 @@ void thread_add_runqueue(struct thread *t){
 }
 
 void thread_yield(void){
-
+	
 }
 
 void dispatch(void){
 	printf("dispatch\n");
+
 }
 
 void schedule(void){
