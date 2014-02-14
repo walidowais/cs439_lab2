@@ -28,21 +28,23 @@ struct thread{
 
 };
 
+struct thread *current_thread;
+
 // Queue stuff
 struct node{
-	struct thread *current;
+	struct thread *node_thread;
 	struct node *next;
 };
 
-struct node *root;
-struct node *last;
+struct node *root_node;
+struct node *last_node;
 
 /*	Returns a pointer to a thread  
 	Accepts a function into the argument f (pointer to the function)
 	arg becomes the function's arguments
 */ 
 struct thread *thread_create(void (*f)(void *arg), void *arg){
-
+	printf("thread_create\n");
 	struct thread *thread_pointer = malloc(sizeof(struct thread));
 
 	int test = posix_memalign((void **)&(thread_pointer->stack), 8, (sizeof(uintptr_t)) * 4096);
@@ -63,16 +65,19 @@ struct thread *thread_create(void (*f)(void *arg), void *arg){
 }
 
 void thread_add_runqueue(struct thread *t){
-	if(!root){
-		root = malloc(sizeof(struct node));
-		last = root;
+	printf("thread_add_runqueue\n");
+	if(!root_node){
+		printf("create root_node\n");
+		root_node = malloc(sizeof(struct node));
+		last_node = root_node;
 	}
 	else{
-		last->next = malloc(sizeof(struct node));
-		last = last->next;
+		printf("add to last_node\n");
+		last_node->next = malloc(sizeof(struct node));
+		last_node = last_node->next;
 	}
 
-	last->current = t;
+	last_node->node_thread = t;
 }
 
 void thread_yield(void){
@@ -80,11 +85,18 @@ void thread_yield(void){
 }
 
 void dispatch(void){
-
+	printf("dispatch\n");
 }
 
 void schedule(void){
+	printf("schedule\n");
+	struct node *temp = root_node;
+	root_node = root_node->next;
 
+	current_thread = temp->node_thread;
+	last_node->next = temp;
+	last_node = last_node->next;
+	last_node->next = 0;
 }
 
 void thread_exit(void){
@@ -93,8 +105,7 @@ void thread_exit(void){
 
 
 void thread_start_threading(void){
-
+	schedule();
+	dispatch();
 }
-
-
 
