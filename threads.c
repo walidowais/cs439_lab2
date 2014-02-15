@@ -1,3 +1,7 @@
+// What i think is broken: it's not saving the state when we yield, 
+// it just restarts the function everytime.
+
+
 #include <stdio.h>
 #include "threads.h" 
 #include <stdint.h> 
@@ -89,7 +93,7 @@ void thread_yield(void){
 	// setjmp(current_thread->saved_state);
 
 	exit_count++;
-	if(exit_count > 10){
+	if(exit_count > 30){
 		exit(1);
 	}
 
@@ -110,6 +114,7 @@ void dispatch(void){
 
 	if(current_thread->state_set){
 		// restore state of current thread
+		printf("saved ya\n");
 		current_thread->state_set = 0;
 		longjmp(current_thread->saved_state, 9);
 		__asm__ volatile("mov %%rax, %%rsp" : : "a" (current_thread->stack_pointer) );
