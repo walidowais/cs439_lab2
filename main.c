@@ -8,7 +8,7 @@ void f3(void *arg)
     int i;
     while (1) {
         printf("thread 3: %d\n", i++);
-        // thread_yield();
+        thread_yield();
     }
 }
 
@@ -20,7 +20,7 @@ void f2(void *arg)
         if (i == 10) {
             i = 0;
         }
-        // thread_yield();
+        thread_yield();
     }
 }
 
@@ -36,7 +36,7 @@ void f1(void *arg)
         if (i == 110) {
             i = 100;
         }
-        // thread_yield();
+        thread_yield();
     }
 }
 
