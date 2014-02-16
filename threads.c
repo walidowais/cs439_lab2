@@ -34,6 +34,7 @@ struct thread{
  	void *parameters;
  	jmp_buf saved_state;
  	int state_set;
+ 	int initial;
 
 };
 
@@ -54,12 +55,13 @@ struct node *last_node;
 	arg becomes the function's arguments
 */ 
 struct thread *thread_create(void (*f)(void *arg), void *arg){
+	fprintf(stderr, "\tthread_create\n");
 	struct thread *thread_pointer = malloc(sizeof(struct thread));
 
 	int test = posix_memalign((void **)&(thread_pointer->stack), 8, (sizeof(uintptr_t)) * 4096);
 
 	if(test){
-		fprintf(stderr, "Error with posix_memalign()\n");
+		fprintf(stderr, "\tError with posix_memalign()\n");
 		exit(1);
 	}
 
@@ -69,11 +71,15 @@ struct thread *thread_create(void (*f)(void *arg), void *arg){
 	thread_pointer -> function_pointer = f;
 	thread_pointer -> parameters = arg;
 
+	thread_pointer -> initial = 0;
+	thread_pointer -> state_set = 0;
+
 	return thread_pointer;
 
 }
 
 void thread_add_runqueue(struct thread *t){
+	fprintf(stderr, "\tthread_add_runqueue\n");
 	if(!root_node){
 		root_node = malloc(sizeof(struct node));
 		last_node = root_node;
@@ -87,65 +93,124 @@ void thread_add_runqueue(struct thread *t){
 }
 
 void thread_yield(void){
-	// __asm__ volatile("mov %%rsp, %%rax" : "=a" (last_thread->stack_pointer) : );
-	// __asm__ volatile("mov %%rbp, %%rax" : "=a" (last_thread->base_pointer) : );
-	// current_thread->state_set = 1;
-	// setjmp(current_thread->saved_state);
+	fprintf(stderr, "\tthread_yield\n");
 
-	exit_count++;
-	if(exit_count > 30){
-		exit(1);
+	int x = 0;
+	current_thread->state_set = 1;
+
+	__asm__ volatile("mov %%rsp, %%rax" : "=a" (current_thread->stack_pointer) : );
+	__asm__ volatile("mov %%rbp, %%rax" : "=a" (current_thread->base_pointer) : );
+
+	x = setjmp(current_thread->saved_state);
+
+	if(!x){
+		exit_count++;
+		if(exit_count > 10){
+			exit(1);
+		}
+	
+		schedule();
+		dispatch();
 	}
 
-	thread_add_runqueue(current_thread);
-	schedule();
-	dispatch();
 }
 
 void dispatch(void){
-	
-	if(last_thread){
-		// save state for last thread
-		__asm__ volatile("mov %%rsp, %%rax" : "=a" (last_thread->stack_pointer) : );
-		__asm__ volatile("mov %%rbp, %%rax" : "=a" (last_thread->base_pointer) : );
-		last_thread->state_set = 1;
-		setjmp(last_thread->saved_state);
-	}
+	fprintf(stderr, "\tdispatch\n");
 
-	if(current_thread->state_set){
-		// restore state of current thread
-		printf("saved ya\n");
-		current_thread->state_set = 0;
-		longjmp(current_thread->saved_state, 9);
-		__asm__ volatile("mov %%rax, %%rsp" : : "a" (current_thread->stack_pointer) );
-		__asm__ volatile("mov %%rax, %%rbp" : : "a" (current_thread->base_pointer) );
-	}
-	else{
+
+	if(!current_thread->initial){
+		current_thread->initial = 1;
+		__asm__ volatile("mov %%rsp, %%rax" : "=a" (current_thread->stack_pointer) : );
+		__asm__ volatile("mov %%rbp, %%rax" : "=a" (current_thread->base_pointer) : );
+
 		current_thread->function_pointer(current_thread->parameters);
 	}
+	else{
+		if(current_thread->state_set){
+			__asm__ volatile("mov %%rax, %%rsp" : : "a" (current_thread->stack_pointer) );
+			__asm__ volatile("mov %%rax, %%rbp" : : "a" (current_thread->base_pointer) );
 
+			longjmp(current_thread->saved_state, 23);
+		}
+		else{
+			fprintf(stderr, "STATE NOT SET\n");
+			exit(1);
+		}
+	}
 	thread_exit();
-
 }
 
 void schedule(void){
+	fprintf(stderr, "\tschedule\n");
 	last_thread = current_thread;
 
-	struct node *temp = root_node;
-	root_node = root_node->next;
-	current_thread = temp->node_thread;
 
-	free(temp);
+
+	if(root_node){
+		struct node *temp = root_node;
+		root_node = root_node->next;
+		current_thread = temp->node_thread;
+		free(temp);
+	}
+	if(last_thread){
+		thread_add_runqueue(last_thread);
+	}
+
+	
 }
 
 void thread_exit(void){
+	fprintf(stderr, "\tthread_exit\n");
 	free(current_thread->stack);
 	free(current_thread);
 }
 
 
 void thread_start_threading(void){
+	fprintf(stderr, "\tthread_start_threading\n");
 	schedule();
 	dispatch();
 }
 
+
+// void thread_yield(void){
+// 	// __asm__ volatile("mov %%rsp, %%rax" : "=a" (last_thread->stack_pointer) : );
+// 	// __asm__ volatile("mov %%rbp, %%rax" : "=a" (last_thread->base_pointer) : );
+// 	// current_thread->state_set = 1;
+// 	// setjmp(current_thread->saved_state);
+
+// exit_count++;
+// if(exit_count > 30){
+// 	exit(1);
+// }
+
+// 	thread_add_runqueue(current_thread);
+// 	schedule();
+// 	dispatch();
+// }
+
+// void dispatch(void){
+	
+// 	if(!last_thread){
+// 		// save state for last thread
+// 		__asm__ volatile("mov %%rsp, %%rax" : "=a" (last_thread->stack_pointer) : );
+// 		__asm__ volatile("mov %%rbp, %%rax" : "=a" (last_thread->base_pointer) : );
+// 		last_thread->state_set = 1;
+// 		setjmp(last_thread->saved_state);
+// 	}
+
+// 	if(current_thread->state_set){
+// 		// restore state of current thread
+// 		current_thread->state_set = 0;
+// 		longjmp(current_thread->saved_state, 9);
+// 		__asm__ volatile("mov %%rax, %%rsp" : : "a" (current_thread->stack_pointer) );
+// 		__asm__ volatile("mov %%rax, %%rbp" : : "a" (current_thread->base_pointer) );
+// 	}
+// 	else{
+// 		current_thread->function_pointer(current_thread->parameters);
+// 	}
+
+// 	thread_exit();
+
+// }
