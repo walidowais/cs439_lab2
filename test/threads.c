@@ -58,14 +58,14 @@ int done = 0;
 */ 
 struct thread *thread_create(void (*f)(void *arg), void *arg){
 
-	// fprintf(stderr, "\tthread_create\n");
+	fprintf(stderr, "\tthread_create\n");
 
 	struct thread *thread_pointer = malloc(sizeof(struct thread));
 
 	int test = posix_memalign((void**)&(thread_pointer->stack), 8, (sizeof(void *)) * 4096);
 
 	if(test){
-		// fprintf(stderr, "Error with posix_memalign()\n");
+		fprintf(stderr, "Error with posix_memalign()\n");
 		exit(1);
 	}
 
@@ -83,7 +83,7 @@ struct thread *thread_create(void (*f)(void *arg), void *arg){
 
 void thread_add_runqueue(struct thread *t){
 	size++;
-	// fprintf(stderr, "\tthread_add_runqueue\n");
+	fprintf(stderr, "\tthread_add_runqueue\n");
 
 	if(!root_node){
 		root_node = malloc(sizeof(struct node));
@@ -99,7 +99,7 @@ void thread_add_runqueue(struct thread *t){
 
 void thread_yield(void){
 
-	// fprintf(stderr, "\tthread_yield\n");
+	fprintf(stderr, "\tthread_yield\n");
 
 	int x = 0;
 	x = setjmp(current_thread->saved_state);
@@ -113,7 +113,7 @@ void thread_yield(void){
 
 void dispatch(void){
 
-	// fprintf(stderr, "\tdispatch\n");
+	fprintf(stderr, "\tdispatch\n");
 	
 	if(last_thread){
 		__asm__ volatile("mov %%rsp, %%rax" : "=a" (last_thread->stack_pointer) : );
@@ -137,7 +137,7 @@ void dispatch(void){
 
 void schedule(void){
 
-	// fprintf(stderr, "\tschedule\n");
+	fprintf(stderr, "\tschedule\n");
 
 	last_thread = current_thread;
 
@@ -146,7 +146,7 @@ void schedule(void){
 		struct node *temp = root_node;
 		root_node = root_node->next;
 		current_thread = temp->node_thread;
-		// free(temp);
+		free(temp);
 	}
 	else{
 		longjmp(main_env, 23);
@@ -156,7 +156,10 @@ void schedule(void){
 
 void thread_exit(void){
 
-	// fprintf(stderr, "\tthread_exit\n");
+	fprintf(stderr, "\tthread_exit\n");
+
+	// free(current_thread->stack);
+	// free(current_thread);
 
 	schedule();
 	if(done == 0){
@@ -167,7 +170,7 @@ void thread_exit(void){
 
 void thread_start_threading(void){
 
-	// fprintf(stderr, "\tthread_start_threading\n");
+	fprintf(stderr, "\tthread_start_threading\n");
 
 	int end = 0;
 	end = setjmp(main_env);

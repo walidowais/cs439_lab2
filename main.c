@@ -3,48 +3,45 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-void f3(void *arg)
-{
+void other_function(void *arg){
     int i;
-    while (1) {
-        printf("thread 3: %d\n", i++);
+    for(i = 0; i < 6; i++){
+        printf("Other thread counter: %d\n", i);
         thread_yield();
     }
 }
 
-void f2(void *arg)
-{
-    int i = 0;
-    while(1) {
-        printf("thread 2: %d\n",i++);
-        if (i == 10) {
-            i = 0;
-        }
-        thread_yield();
-    }
-}
+void sum(void *arg){
+	int *arr = (int *)arg;
+	printf("Adding array of following values:\n%d %d %d %d\n", arr[1], arr[2], arr[3], arr[4]);
 
-void f1(void *arg)
-{
-    int i = 100;
-    struct thread *t2 = thread_create(f2, NULL);
-    thread_add_runqueue(t2);
-    struct thread *t3 = thread_create(f3, NULL);
-    thread_add_runqueue(t3);
-    while(1) {
-        printf("thread 1: %d\n", i++);
-        if (i == 110) {
-            i = 100;
-        }
-        thread_yield();
-    }
+	int i;
+	int sum = 0;
+	for(i = 1; i < arr[0]; i++){
+		sum += arr[i];
+		printf("Sum so far: %d\n", sum);
+		thread_yield();
+	}
 }
 
 int main(int argc, char **argv)
 {
-    struct thread *t1 = thread_create(f1, NULL);
-    thread_add_runqueue(t1);
+    struct thread *other_thread = thread_create(other_function, NULL);
+    thread_add_runqueue(other_thread);
+
+    int *ptr;
+	ptr = (int *) malloc(5 * sizeof(int));
+
+	ptr[0] = 5;
+	ptr[1] = 110;
+	ptr[2] = 222;
+	ptr[3] = 333;
+	ptr[4] = 444;
+
+    struct thread *add_thread = thread_create(sum, ptr);
+    thread_add_runqueue(add_thread);
+
 	thread_start_threading();
-    printf("\nexited\n");
+    printf("FINISH\n");
     return 0;
 }

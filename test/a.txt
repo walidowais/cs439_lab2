@@ -1,0 +1,9 @@
+creating thread 1 in main
+***** start threading *****
+f1
+creating thread 2 in f1
+yielding in f1
+f2
+creating thread 3 in f2
+yielding in f2
+finishing f1 after yield

@@ -4,10 +4,57 @@ danielvd
 Walid Owais
 walid
 
-02/11 4:00pm - 7:00pm
-30 min, Daniel driving, research
-30 min, Walid driving, research
-30 min, Daniel driving, research
+02/12 4:00pm - 7:00pm
+30 min, Daniel driving, going over directions for lab 
+30 min, Walid driving, the piazza hunt begins! 
+30 min, Daniel driving, going over the queue and longjmp/setjmp
 30 min, Walid driving, tested passing void * argments to function
 30 min, Daniel driving, tested passing void * argments to function
-30 min, Walid driving, tested passing void * argments to function
+30 min, Walid driving, looked about uintptr_t 
+
+
+02/13 5:00pm - 7:00pm
+30 min, Walid driving, gotta do them stack pointers and base pointer bro 
+30 min, Daniel driving, making sure we're not missing stuff from thread struct
+30 min, Walid driving, the piazza hunt begins! looking for stuff about the thread struct 
+30 min, Daniel driving, made sure everything was uintptr_t 
+
+
+02/14 9:00 PM - 1:00 AM
+30 min, Daniel driving, implemented stack using posix_memalign 
+30 min, Walid driving, writing the linkedlist 
+30 min, Daniel driving, finished the linkedlist aka the queue 
+30 min, Walid driving,  adding stuff to the end of the queue with thread_add_runqueue
+30 min, Daniel driving, making sure our add is actually a queue 
+30 min, Walid driving, watched the olympics for a bit, lol...
+30 min, Daniel driving, still watching olympics :(
+30 min, Walid driving, added some comments for readability  
+
+
+02/15 9:00 PM - 2:00 AM 
+30 min, Daniel driving, almost done with threads.c
+30 min, Walid driving, figuring out where to put assembly 
+30 min, Daniel driving, seems like dispatch => best place 
+30 min, Walid driving, small testing here and there, trying to make sure every function runs without errors
+30 min, Daniel driving, threw assembly code in woo 
+30 min, Walid driving, oh god what is going on 
+30 min, Daniel driving, why do segfaults exist? (segfaulted after thread 1)
+30 min, Walid driving, seems like our jump function isn't correctly implemented. keep going to beginning of f1
+30 min, Daniel driving, placing print statements to narrow down bug 
+30 min, Walid driving,  has to do with our stupid dispatch cause we aren't loading stuff correctly
+
+
+02/16 4:00pm - 11:30PM
+30 min, Walid driving, trying to fix the terrible dispatch function 
+30 min, Daniel driving, researching more about setjmp and longjmp 
+30 min, Walid driving, a little bit lost about the assembly...
+30 min, Daniel driving, tested passing void * argments to function
+30 min, Walid driving, some GDB fun 
+30 min, Daniel driving, more GDB fun, along with disassemble and checking to see if assembly matched 
+30 min, Walid driving, at this point GDB really isn't fun. Seg faults are destroying our confidence... 
+30 min, Daniel driving, decided to switch to valgrind, change up the pace. 
+30 min, Walid driving, plagued with a terrible memory alloc error. Where the hell is our stack even at? 
+30 min, Daniel driving, seems like we aren't allocating stack correctly 
+30 min, Walid driving, massive testing to locate our bug 
+30 min, Daniel driving, we forgot to add 4096 to our stack pointer. Everything works otherwise........ 
+30 min, Walid driving, turns out there's a small bug with our frees #YOLO 
