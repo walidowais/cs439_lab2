@@ -58,4 +58,7 @@ walid
 30 min, Walid driving, massive testing to locate our bug 
 30 min, Daniel driving, we forgot to add 4096 to our stack pointer. Everything works otherwise........ 
 30 min, Walid driving, turns out there's a small bug with our frees #YOLO 
+<<<<<<< HEAD
+=======
 
+>>>>>>> f4bab6fbc3b9dbdc065e629f950ed58baf9ca478
